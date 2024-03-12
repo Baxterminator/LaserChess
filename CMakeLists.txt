@@ -10,22 +10,22 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 ########################## Common Lib #############################
-file(GLOB_RECURSE common_src RELATIVE "${CMALE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/common/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/common/**/**.cpp")
+file(GLOB_RECURSE common_src RELATIVE "${CMALE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/common/src/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/common/src/**/**.cpp")
 add_library(common ${common_src})
-target_include_directories(common PRIVATE include)
+target_include_directories(common PRIVATE "common/include/")
 
 ##########################   Server   #############################
-file(GLOB_RECURSE server_src RELATIVE "${CMALE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/server/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/server/**/**.cpp")
+file(GLOB_RECURSE server_src RELATIVE "${CMALE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/server/src/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/server/src/**/**.cpp")
 if (server_src)
   add_executable(server ${server_src})
-  target_include_directories(server PRIVATE include)
+  target_include_directories(server PRIVATE "server/include" "common/include")
   target_link_libraries(server PRIVATE common)
 endif()
 
 ##########################     AI     #############################
-file(GLOB_RECURSE ai_src RELATIVE "${CMALE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/ai/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/ai/**/**.cpp")
+file(GLOB_RECURSE ai_src RELATIVE "${CMALE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/ai/src/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/ai/src/**/**.cpp")
 if (ai_src)
   add_executable(ai_client ${ai_src})
-  target_include_directories(ai_client PRIVATE include)
+  target_include_directories(ai_client PRIVATE "ai/include" "common/include")
   target_link_libraries(ai_client PRIVATE common)
 endif()
