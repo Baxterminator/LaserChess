@@ -1,10 +1,27 @@
+#include "common/args/parser.hpp"
 #include "common/socket/socket.hpp"
 
+using laser::args::ArgumentParser;
 using laser::com::Socket;
 
-int main(int argc, char **charv) {
-  std::cout << "Initializing AI client" << std::endl;
-  auto sock = Socket("127.0.0.1", 5001);
+ArgumentParser make_parser() {
+  auto parser = ArgumentParser();
+  parser.add_arg("--port");
+  parser.add_arg("--ip");
+  return parser;
+}
+
+int main(int argc, char **argv) {
+  // Argument parsing
+  auto parser = make_parser();
+  parser.parse_args(argc, argv);
+  parser.display_args();
+
+  auto ip = parser.get<std::string>("--ip", "127.0.0.1");
+  auto port = parser.get<int>("--port", 5001);
+
+  std::cout << "Initializing AI client with server (" << ip << ":" << port << ")" << std::endl;
+  auto sock = Socket(ip, port);
   if (sock.connectToServer()) {
     std::cout << "Waiting for message" << std::endl;
     std::string output;

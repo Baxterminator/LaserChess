@@ -58,8 +58,6 @@ SocketErrors Socket::receive_data(std::string &output) const {
     else
       buff_idx++;
 
-    std::cout << buff_idx << " - " << buff << std::endl;
-
     // Check for message ending
     if (buff_idx >= BUFF_SIZE - 1) {
       buff[BUFF_SIZE - 1] = '\0';
