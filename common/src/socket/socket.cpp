@@ -36,7 +36,7 @@ SocketErrors Socket::send_data(const std::string &data) const {
 
 SocketErrors Socket::receive_data(std::string &output) const {
   char buff[BUFF_SIZE];
-  memset(buff, 0, BUFF_SIZE);
+  memset(buff, '\0', BUFF_SIZE);
   int buff_idx = 0;
 
   // Read one byte at the time
@@ -58,18 +58,19 @@ SocketErrors Socket::receive_data(std::string &output) const {
     else
       buff_idx++;
 
+    std::cout << buff_idx << " - " << buff << std::endl;
+
     // Check for message ending
     if (buff_idx >= BUFF_SIZE - 1) {
       buff[BUFF_SIZE - 1] = '\0';
       output = std::string(buff, 0, BUFF_SIZE);
       return SocketErrors::DATA_EXCEEDING_BUFFER_LENGTH;
-    } else if (buff[buff_idx] == EOM) {
+    } else if (buff[buff_idx - 1] == EOM) {
       buff[++buff_idx] = '\0';
       output = std::string(buff, 0, BUFF_SIZE);
       return SocketErrors::NO_ERROR;
     }
     // TODO: Add timeout
-    buff_idx++;
   }
 }
 
