@@ -2,6 +2,8 @@
 #include <vector>
 #include <array>
 #include <algorithm>
+#include <sstream>
+#include <iostream>
 #include "ai/Piece.hpp"
 #include "ai/Laser.hpp"
 #include "ai/Board.hpp"
@@ -61,25 +63,33 @@ Square* LaserHit(Board& board, PieceColors_t playerColor)
         }
         position = position + laserDirection;
     }
+    return nullptr;
 }
 
 
 std::shared_ptr<Piece> Board::RemoveLaserHitPiece(Square* pHitSquare)
 {
-    std::shared_ptr<Piece> hitPiece = pHitSquare->Piece;
-    if (pHitSquare->Piece->GetPieceColor() == BLUE) {
-        this->BluePiecesSquares.erase(*pHitSquare);
-        //Piece is destroyed
-        pHitSquare->Piece = nullptr;
+    try {
+        std::shared_ptr<Piece> hitPiece = pHitSquare->Piece;
+        if (pHitSquare->Piece->GetPieceColor() == BLUE) {
+            this->BluePiecesSquares.erase(*pHitSquare);
+            //Piece is destroyed
+            pHitSquare->Piece = nullptr;
+        }
+
+        else if (pHitSquare->Piece->GetPieceColor() == RED) {
+            this->RedPiecesSquares.erase(*pHitSquare);
+            //Piece is destroyed
+            pHitSquare->Piece = nullptr;
+        }
+        return hitPiece;
     }
 
-    else if (pHitSquare->Piece->GetPieceColor() == RED) {
-        this->RedPiecesSquares.erase(*pHitSquare);
-        //Piece is destroyed
-        pHitSquare->Piece = nullptr;
+    catch (...) {
+        std::cout << "something went wrong" << std::endl;
     }
 
-    return hitPiece;
+    
 }
 
 Vector FindKingPosition(std::unordered_set<Square, Square::HashFunction>& pieceSquares)
@@ -306,7 +316,47 @@ void Board::PopulatePiecesSets()
 }
 
 
-void FindBestMove(PieceColors_t playerColor, Board board)
+std::string MoveToStringRepresentation(std::shared_ptr<Move> move)
+{
+    std::string startColumn = std::to_string(move->StartPosition.x);
+    std::string startRow = std::to_string(move->StartPosition.y);
+    std::string endColumn = std::to_string(move->EndPosition.x);
+    std::string endRow = std::to_string(move->EndPosition.y);
+
+    std::string moveStringRepresentation = ";move " + startRow + " " + startColumn + " " + endRow + " " + endColumn + "\n";
+    return moveStringRepresentation;
+}
+
+void StringToMove(std::string moveString, Board& board)
+{
+    std::stringstream strStream;
+    strStream << moveString.substr(6);
+    std::vector<int> numbers;
+    for(int i = 0; strStream >> i; ) {
+        numbers.push_back(i);
+        // std::cout << i << " ";
+    }
+
+    int startRow = numbers[0];
+    int startColumn = numbers[1];
+    int endRow = numbers[2];
+    int endColumn = numbers[3];
+    
+    Vector startPosition = {startRow, startColumn};
+    Vector endPosition = {endRow, endColumn};
+    // Switch places?
+    if (board.board[endRow][endColumn].Piece == nullptr) {
+        std::shared_ptr<ShiftMove> shiftMove = std::make_shared<ShiftMove>(ShiftMove(startPosition, endPosition));
+        MakeMove(board, shiftMove, RED);
+    }
+
+    else {
+        std::shared_ptr<SwitchMove> switchMove = std::make_shared<SwitchMove>(SwitchMove(startPosition, endPosition));
+        MakeMove(board, switchMove, RED);
+    }
+}
+
+std::string FindBestMove(PieceColors_t playerColor, Board& board)
 {
     float bestEval = 0.0f;
     std::unordered_set<Square, Square::HashFunction> playerSquares;
@@ -331,4 +381,7 @@ void FindBestMove(PieceColors_t playerColor, Board board)
                                                                            { return a.Evaluation > b.Evaluation; } );
     //Applies the move to the board.
     MakeMove(board, evaluationResults[0].Move, playerColor);
+
+    std::string moveStringRepresentation = MoveToStringRepresentation(evaluationResults[0].Move);
+    return moveStringRepresentation;
 }

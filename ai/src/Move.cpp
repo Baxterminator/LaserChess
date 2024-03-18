@@ -46,7 +46,7 @@ bool ShiftMove::LegalMove(const Board_t& board, PieceColors_t playerColor) const
 void ShiftMove::ApplyMove(Board& board)
 {
     Square& startSq = board.board[this->StartPosition.y][this->StartPosition.x];
-    Square& endSq = board.board[this->EndPosition.y][this->EndPosition.y];
+    Square& endSq = board.board[this->EndPosition.y][this->EndPosition.x];
     std::shared_ptr<Piece> piece = startSq.Piece;
     PieceColors_t pieceColor = piece->GetPieceColor();
     startSq.Piece = nullptr;

@@ -12,7 +12,10 @@ typedef enum rotationDirections_tag {
 
 class Move {
 public:
-
+    Vector StartPosition;
+    Vector EndPosition;
+    Move() : StartPosition(ZERO_VECTOR), EndPosition(ZERO_VECTOR) {}
+    Move(Vector startPosition, Vector endPosition) : StartPosition(startPosition), EndPosition(endPosition) {}
     virtual ~Move() = default;
     virtual bool LegalMove(const Board_t& board, PieceColors_t playerColor) const = 0;
     virtual void ApplyMove(Board& board) = 0;
@@ -25,9 +28,8 @@ public:
 // Classic shift. Move from one square to the other
 class ShiftMove : public Move {
 public:
-    Vector StartPosition;
-    Vector EndPosition;
-    ShiftMove(Vector startPosition, Vector endPosition) : StartPosition(startPosition), EndPosition(endPosition) {}
+
+    ShiftMove(Vector startPosition, Vector endPosition) : Move(startPosition, endPosition) {}
     bool LegalMove(const Board_t& board, PieceColors_t playerColor) const override;
     void ApplyMove(Board& board) override;
 };
@@ -35,9 +37,9 @@ public:
 //Switches positions with the piece (Only switches can perform this move)
 class SwitchMove : public Move {
 public:
-    Vector StartPosition;
-    Vector EndPosition;
-    SwitchMove(Vector startPosition, Vector endPosition) : StartPosition(startPosition), EndPosition(endPosition) {}
+    // Vector StartPosition;
+    // Vector EndPosition;
+    SwitchMove(Vector startPosition, Vector endPosition) : Move(startPosition, endPosition) {}
     bool LegalMove(const Board_t& board, PieceColors_t playerColor) const override;
     void ApplyMove(Board& board) override;
 };

@@ -8,6 +8,7 @@ typedef enum ClientMessages_tag {
     LOST_GAME,
     ACTION_VALID,
     ACTION_INVALID,
+    MOVE_STRING,
     INVALID_MESSAGE
 } ClientMessages_t;
 

@@ -31,6 +31,7 @@ public:
     // void MakeMove(const Move& move);
 };
 
-void FindBestMove(PieceColors_t playerColor, Board board);
+std::string FindBestMove(PieceColors_t playerColor, Board& board);
+void StringToMove(std::string moveString, Board& board);
 
 #endif

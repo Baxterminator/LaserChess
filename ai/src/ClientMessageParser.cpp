@@ -7,6 +7,7 @@ const std::string CLIENTMESSAGES[] =
     ";lost\n",
     ";action valid\n",
     ";action invalid\n",
+    ";move"
 };
 
 ClientMessages_t ClientMessageParser(std::string Message)
@@ -35,6 +36,11 @@ ClientMessages_t ClientMessageParser(std::string Message)
     else if (Message == CLIENTMESSAGES[ACTION_INVALID])
     {
         clientMessage = ACTION_INVALID;
+    }
+
+    else if (Message.substr(0, 5) == CLIENTMESSAGES[MOVE_STRING]) 
+    {
+        clientMessage = MOVE_STRING;
     }
 
     return clientMessage;
