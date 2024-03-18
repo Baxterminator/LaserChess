@@ -25,16 +25,20 @@ bool Socket::connectToServer() {
 ///////////////////////////////////////////////////////////////////////////////
 
 SocketErrors Socket::send_data(const std::string &data) const {
+  if (!is_init()) return SocketErrors::NO_INIT;
+
   if (data.size() > BUFF_SIZE) return SocketErrors::DATA_EXCEEDING_BUFFER_LENGTH;
 
   if (send(sock, data.c_str(), data.size() + 1, 0) == SOCKET_ERROR) {
-    return SocketErrors::SOCKET_ERROR1;
+    return SocketErrors::SOCKET_ERROR;
   }
 
-  return SocketErrors::NO_ERROR1;
+  return SocketErrors::NO_ERROR;
 }
 
 SocketErrors Socket::receive_data(std::string &output) const {
+  if (!is_init()) return SocketErrors::NO_INIT;
+
   char buff[BUFF_SIZE];
   memset(buff, '\0', BUFF_SIZE);
   int buff_idx = 0;
@@ -46,7 +50,7 @@ SocketErrors Socket::receive_data(std::string &output) const {
     // If socket error, returns
     if (bytesReceived == SOCKET_ERROR) {
       output = "";
-      return SocketErrors::SOCKET_ERROR1;
+      return SocketErrors::SOCKET_ERROR;
     }
 
     // If nothing happened, re run
@@ -66,7 +70,7 @@ SocketErrors Socket::receive_data(std::string &output) const {
     } else if (buff[buff_idx - 1] == EOM) {
       buff[++buff_idx] = '\0';
       output = std::string(buff, 0, BUFF_SIZE);
-      return SocketErrors::NO_ERROR1;
+      return SocketErrors::NO_ERROR;
     }
     // TODO: Add timeout
   }

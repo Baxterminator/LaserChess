@@ -4,9 +4,10 @@
 namespace laser::com {
 
 enum class SocketErrors {
-  NO_ERROR1 = 0,
+  NO_ERROR = 0,
   DATA_EXCEEDING_BUFFER_LENGTH,
-  SOCKET_ERROR1,
+  SOCKET_ERROR,
+  NO_INIT,
 };
 
 }

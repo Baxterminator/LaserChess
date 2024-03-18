@@ -1,8 +1,8 @@
 #include "common/args/parser.hpp"
 #include "common/socket/server.hpp"
+#include "server/server.hpp"
 
 using laser::args::ArgumentParser;
-using laser::com::SocketServer;
 
 ArgumentParser make_parser() {
   auto parser = ArgumentParser();
@@ -18,24 +18,10 @@ int main(int argc, char **argv) {
   auto port = parser.get<int>("--port", 5001);
 
   std::cout << "Initializing game server on port " << port << std::endl;
-  auto com_server = SocketServer(port);
+  laser::server::GameServer server(port);
+  server.wait_for_players();
 
-  // Wait for both player
-  auto player1 = com_server.wait_for_client();
-  // auto player2 = com_server.wait_for_client();
-
-  std::cout << "Sending message" << std::endl;
-  player1.send_data(";testmsg\n");
-  player1.send_data(";yourturn\n");
-  player1.send_data(";won\n");
-  player1.send_data(";lost\n");
-  player1.send_data(";action valid\n");
-  player1.send_data(";action invalid\n");
-
-  std::cout << "Waiting for message" << std::endl;
-  std::string output;
-  player1.receive_data(output);
-  std::cout << "Received from client msg: (" << output << ")" << std::endl;
+  while (!server.is_game_done()) server.loop();
 
   return 0;
 }
