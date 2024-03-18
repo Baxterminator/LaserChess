@@ -28,10 +28,10 @@ SocketErrors Socket::send_data(const std::string &data) const {
   if (data.size() > BUFF_SIZE) return SocketErrors::DATA_EXCEEDING_BUFFER_LENGTH;
 
   if (send(sock, data.c_str(), data.size() + 1, 0) == SOCKET_ERROR) {
-    return SocketErrors::SOCKET_ERROR;
+    return SocketErrors::SOCKET_ERROR1;
   }
 
-  return SocketErrors::NO_ERROR;
+  return SocketErrors::NO_ERROR1;
 }
 
 SocketErrors Socket::receive_data(std::string &output) const {
@@ -46,7 +46,7 @@ SocketErrors Socket::receive_data(std::string &output) const {
     // If socket error, returns
     if (bytesReceived == SOCKET_ERROR) {
       output = "";
-      return SocketErrors::SOCKET_ERROR;
+      return SocketErrors::SOCKET_ERROR1;
     }
 
     // If nothing happened, re run
@@ -66,7 +66,7 @@ SocketErrors Socket::receive_data(std::string &output) const {
     } else if (buff[buff_idx - 1] == EOM) {
       buff[++buff_idx] = '\0';
       output = std::string(buff, 0, BUFF_SIZE);
-      return SocketErrors::NO_ERROR;
+      return SocketErrors::NO_ERROR1;
     }
     // TODO: Add timeout
   }

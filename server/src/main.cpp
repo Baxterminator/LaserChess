@@ -26,6 +26,11 @@ int main(int argc, char **argv) {
 
   std::cout << "Sending message" << std::endl;
   player1.send_data(";testmsg\n");
+  player1.send_data(";yourturn\n");
+  player1.send_data(";won\n");
+  player1.send_data(";lost\n");
+  player1.send_data(";action valid\n");
+  player1.send_data(";action invalid\n");
 
   std::cout << "Waiting for message" << std::endl;
   std::string output;
