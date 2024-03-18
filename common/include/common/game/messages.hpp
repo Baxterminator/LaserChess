@@ -44,6 +44,8 @@ std::string getCommand(const std::string &str);
 
 Messages getMessage(const std::string &msg);
 
+std::string makeTurnCommand();
+
 }  // namespace laser::com
 
 #endif

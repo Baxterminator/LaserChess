@@ -5,6 +5,7 @@
 
 #include "common/socket/server.hpp"
 #include "common/socket/socket.hpp"
+#include "server/player.hpp"
 
 namespace laser::server {
 
@@ -28,7 +29,8 @@ class GameServer : private com::SocketServer {
   void loop();
 
  private:
-  com::Socket player1, player2;
+  bool round_player1 = true;
+  Player player1, player2;
   bool done = false;
 };
 

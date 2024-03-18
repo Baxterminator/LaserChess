@@ -1,5 +1,7 @@
 #include "common/game/messages.hpp"
 
+#include <sstream>
+
 namespace laser::com {
 
 std::string getCommand(const std::string &str) {
@@ -34,6 +36,12 @@ Messages getMessage(const std::string &msg) {
     }
   }
   return Messages::INVALID_MESSAGE;
+}
+
+std::string makeTurnCommand() {
+  std::stringstream ss;
+  ss << SOM << MessageMap.at(Messages::YOUR_TURN).first << EOM;
+  return ss.str();
 }
 
 }  // namespace laser::com
