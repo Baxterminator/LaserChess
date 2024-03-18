@@ -7,7 +7,13 @@ namespace laser::com {
 
 Socket::Socket(const std::string &ip, int port) : SocketBase(ip, port) {}
 
-Socket::Socket(SOCKET _sock) : SocketBase(), connected(true) { sock = _sock; }
+Socket::Socket(SOCKET _sock) : SocketBase(), connected(true) {
+  sock = _sock;
+  if (!is_init())
+    std::cout << "Not initialized socket !" << std::endl;
+  else
+    std::cout << "Got an initialized socket!" << std::endl;
+}
 
 bool Socket::connectToServer() {
   // If already connected, then we are connected
@@ -50,6 +56,7 @@ SocketErrors Socket::receive_data(std::string &output) const {
     // If socket error, returns
     if (bytesReceived == SOCKET_ERROR) {
       output = "";
+      std::cout << "Socket Error on receive" << std::endl;
       return SocketErrors::SOCKET_ERROR;
     }
 
@@ -67,12 +74,11 @@ SocketErrors Socket::receive_data(std::string &output) const {
       buff[BUFF_SIZE - 1] = '\0';
       output = std::string(buff, 0, BUFF_SIZE);
       return SocketErrors::DATA_EXCEEDING_BUFFER_LENGTH;
-    } else if (buff[buff_idx - 1] == EOM) {
+    } else if (buff[buff_idx - 1] == EOM || buff[buff_idx - 1] == '\0') {
       buff[++buff_idx] = '\0';
       output = std::string(buff, 0, BUFF_SIZE);
       return SocketErrors::NO_ERROR;
     }
-    // TODO: Add timeout
   }
 }
 

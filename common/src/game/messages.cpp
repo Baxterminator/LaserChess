@@ -23,12 +23,8 @@ std::string getCommand(const std::string &str) {
       width = 0;
       start = i + 1;
     } else if (found_start) {
+      if (str[i] == EOM) return str.substr(start, width);
       width++;
-    }
-
-    // Looking or command end;
-    if (found_start && str[i] == EOM) {
-      return str.substr(start, width);
     }
   }
   return MessageMap.at(Messages::INVALID_MESSAGE).first;
@@ -45,9 +41,11 @@ Messages getMessage(const std::string &msg) {
   return Messages::INVALID_MESSAGE;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 std::string makeTurnCommand() {
   std::stringstream ss;
-  ss << SOM << MessageMap.at(Messages::YOUR_TURN).first << EOM;
+  ss << SOM << MessageMap.at(Messages::YOUR_TURN).first << " " << EOM;
   return ss.str();
 }
 
@@ -75,11 +73,55 @@ std::string makeLost() {
   return ss.str();
 }
 
-std::string makeLvlDescription(const char *level) {
+std::string makeLvlDescription(const char *level, bool start_now) {
   std::stringstream ss;
-  ss << SOM << MessageMap.at(Messages::LVL).first << " " << level << EOM;
+  ss << SOM << MessageMap.at(Messages::LVL).first << " " << ((start_now) ? 1 : 0) << " " << level << EOM;
   return ss.str();
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool isLvlDescription(const std::string &msg) {
+  auto &elem = MessageMap.at(Messages::LVL);
+  return std::strncmp(getCommand(msg).c_str(), elem.first, elem.second) == 0;
+}
+
+bool isMyTurn(const std::string &msg) {
+  auto &elem = MessageMap.at(Messages::YOUR_TURN);
+  return std::strncmp(getCommand(msg).c_str(), elem.first, elem.second) == 0;
+}
+
+bool isLost(const std::string &msg) {
+  auto &elem = MessageMap.at(Messages::LOST_GAME);
+  return std::strncmp(getCommand(msg).c_str(), elem.first, elem.second) == 0;
+}
+
+bool isWon(const std::string &msg) {
+  auto &elem = MessageMap.at(Messages::WON_GAME);
+  return std::strncmp(getCommand(msg).c_str(), elem.first, elem.second) == 0;
+}
+
+bool isValidAction(const std::string &msg) {
+  auto &elem = MessageMap.at(Messages::ACTION_VALID);
+  return std::strncmp(getCommand(msg).c_str(), elem.first, elem.second) == 0;
+}
+
+bool isInvalidAction(const std::string &msg) {
+  auto &elem = MessageMap.at(Messages::ACTION_INVALID);
+  return std::strncmp(getCommand(msg).c_str(), elem.first, elem.second) == 0;
+}
+
+bool isMove(const std::string &msg) {
+  auto &elem = MessageMap.at(Messages::MOVE);
+  return std::strncmp(getCommand(msg).c_str(), elem.first, elem.second) == 0;
+}
+
+bool isRot(const std::string &msg) {
+  auto &elem = MessageMap.at(Messages::ROT);
+  return std::strncmp(getCommand(msg).c_str(), elem.first, elem.second) == 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 std::shared_ptr<game::Move> parseMove(const char *msg) {
   // Parse movement

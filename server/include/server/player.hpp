@@ -13,9 +13,9 @@ struct Player : public com::Socket {
   static constexpr const char* PLAYER_2{"Player 2"};
 
   Player() : com::Socket() {}
-  Player(const char* name, game::PieceColor color, com::Socket sk);
+  Player(std::string name, game::PieceColor color, SOCKET sk);
 
-  void sendLevel(const char* lvl) { send_data(com::makeLvlDescription(lvl)); }
+  void sendLevel(const char* lvl, bool start) { send_data(com::makeLvlDescription(lvl, start)); }
   void sendTurnStart() { send_data(com::makeTurnCommand()); }
   void sendMoveInvalid() { send_data(com::makeInvalidAction()); }
   void sendMoveValid() { send_data(com::makeValidAction()); }
@@ -25,7 +25,7 @@ struct Player : public com::Socket {
   std::shared_ptr<game::Move> getMovement();
 
  public:
-  const char* name;
+  std::string name;
   game::PieceColor color;
   std::string last_msg{""};
   std::shared_ptr<game::Move> last_move;

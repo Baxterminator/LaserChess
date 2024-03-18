@@ -23,14 +23,14 @@ class Board {
   Board(){};
   ~Board(){};
 
-  bool loadFromString(std::string LayoutString);
+  bool loadFromString(const char*);
   void populatePiecesSets();
-  std::shared_ptr<Piece> RemoveLaserHitPiece(Square *pHitSquare);
+  std::shared_ptr<Piece> RemoveLaserHitPiece(Square* pHitSquare);
 
   PieceColor hasSomeoneWon();
 };
 
-void FindBestMove(PieceColor playerColor, Board board);
+std::string FindBestMove(PieceColor playerColor, Board& board);
 
 }  // namespace laser::game
 

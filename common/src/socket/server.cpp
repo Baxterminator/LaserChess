@@ -1,12 +1,19 @@
 #include "common/socket/server.hpp"
 
+#include "common/socket/base.hpp"
+
 namespace laser::com {
 
 SocketServer::SocketServer(int port) : SocketBase(port) { (void)bind(sock, (sockaddr *)&hint, sizeof(hint)); }
 
-Socket SocketServer::wait_for_client() {
+Socket SocketServer::wait_for_client() { return Socket(wait_for_client_raw()); }
+
+SOCKET SocketServer::wait_for_client_raw() {
   // Wait for a client
-  if (listen(sock, SOMAXCONN) == -1) return INVALID_SOCKET;
+  if (listen(sock, SOMAXCONN) == -1) {
+    std::cout << "Too many sockets :/" << std::endl;
+    return INVALID_SOCKET;
+  }
 
   // Get client
   sockaddr_in client;
@@ -28,7 +35,7 @@ Socket SocketServer::wait_for_client() {
     inet_ntop(AF_INET, &client.sin_addr, host, NI_MAXHOST);
     std::cout << host << " connected on port " << ntohs(client.sin_port) << std::endl;
   }
-  return Socket(clientSocket);
+  return clientSocket;
 }
 
 }  // namespace laser::com

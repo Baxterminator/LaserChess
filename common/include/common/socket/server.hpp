@@ -32,6 +32,13 @@ class SocketServer : public SocketBase {
    * @return SocketClient
    */
   Socket wait_for_client();
+
+  /**
+   * @brief Wait for a new client to connect and return an opened socket to use.
+   *
+   * @return SOCKET
+   */
+  SOCKET wait_for_client_raw();
 };
 
 }  // namespace laser::com

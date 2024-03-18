@@ -16,9 +16,7 @@
 
 namespace laser::game {
 
-bool Board::loadFromString(std::string layoutString) {
-  const char *p = layoutString.c_str();
-
+bool Board::loadFromString(const char *p) {
   // Load general board settings
   long nrow = std::strtol(p, (char **)&p, 10);
   long ncol = std::strtol(p, (char **)&p, 10);

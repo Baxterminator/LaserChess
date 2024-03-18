@@ -6,8 +6,9 @@ A message begins by the byte ';' and ends with the byte '\n'
 
 ## List of messages
 
-- **SERVER -> CLIENT** `;lvl <nrow> <ncol> <npieces> <desc>\n` 
+- **SERVER -> CLIENT** `;lvl <start_now> <nrow> <ncol> <npieces> <desc>\n` 
   - Send the layout of the level during the setup phase
+  - start_now: 1 if the player will be the first one to play
   - nrow: the number of rows of the level
   - ncol: the number of columns of the level
   - npieces: the number of pieces on board (Red+Blue). Using to check for next field

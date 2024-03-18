@@ -8,8 +8,7 @@
 
 namespace laser::server {
 
-Player::Player(const char* _name, game::PieceColor color, com::Socket sk)
-    : com::Socket(sk), name(_name), color(color) {}
+Player::Player(std::string _name, game::PieceColor color, SOCKET sk) : com::Socket(sk), name(_name), color(color) {}
 
 std::shared_ptr<game::Move> Player::getMovement() {
   // Receive data

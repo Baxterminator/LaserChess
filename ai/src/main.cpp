@@ -1,3 +1,4 @@
+#include "ai/AIClient.hpp"
 #include "common/args/parser.hpp"
 #include "common/game/board.hpp"
 #include "common/game/messages.hpp"
@@ -5,29 +6,9 @@
 #include "common/socket/errors.hpp"
 #include "common/socket/socket.hpp"
 
+using laser::ai::LaserChessAI;
 using laser::args::ArgumentParser;
 using laser::com::Messages;
-using laser::com::Socket;
-using laser::game::Board;
-
-bool StayConnected = true;
-
-typedef enum ClientStates_tag {
-  WAIT_FOR_TURN,  //
-  COMPUTE_MOVE,   // Computes a move to perform
-  // WAIT_FOR_ACK,
-  // APPLY_MOVE, //;action valid\n received, apply move to internal boardstate
-  APPLY_PLAYER_MOVE,  // Applies the human players move to internal boardstate
-  WON_LOST,           // Game is over, close connection and program
-} ClientStates_t;
-
-static ClientStates_t clientState = WAIT_FOR_TURN;
-
-static Board boardState = Board();
-
-auto sock = Socket("127.0.0.1", 5001);
-
-static void ClientStateMachine(void);
 
 ArgumentParser make_parser() {
   auto parser = ArgumentParser();
@@ -44,100 +25,18 @@ int main(int argc, char **argv) {
   parser.parse_args(argc, argv);
   parser.display_args();
 
-  boardState.CreateDefaultBoard();
-  // StringToMove(";move 5 5 3 9\n", boardState);
+  auto srv_ip = parser.get<std::string>("--ip", "127.0.0.1");
+  auto srv_port = parser.get<int>("--port", 5001);
 
-  if (sock.connectToServer()) {
-    while (StayConnected) {
-      std::cout << "Waiting for message" << std::endl;
-      std::string output;
-      sock.receive_data(output);
-      std::cout << "Received from server msg: (" << output << ")" << std::endl;
-      // Messages ClientMessage = ClientMessageParser(output);
-      // MessageParser(ClientMessage, output);
+  LaserChessAI ai(srv_ip, srv_port);
+  if (ai.connectToServer()) {
+    std::cout << "Connected to server " << srv_ip << ":" << srv_port << std::endl;
+    std::cout << "Waiting for level description ..." << std::endl;
+    while (!ai.is_game_done()) {
+      ai.loop();
     }
-    // std::cout << "Sending message" << std::endl;
-    // sock.send_data(";clientmsg\n");
-  } else {
+  } else
     std::cout << "Couldn't connect to server" << std::endl;
-  }
 
   return 0;
-}
-
-static void ClientStateMachine(void) {
-  switch (clientState) {
-    case WAIT_FOR_TURN: {
-      // do nothing, wait for turn
-      break;
-    }
-
-    case COMPUTE_MOVE: {
-      // std::string moveString = FindBestMove(BLUE, boardState);
-      //  if (sock.send_data(moveString) == laser::com::SocketErrors::NO_ERROR1) {
-      //    // clientState = WAIT_FOR_ACK;
-      //  }
-      break;
-    }
-
-      // case WAIT_FOR_ACK:
-      // {
-      //   break;
-      // }
-
-      // case APPLY_MOVE:
-      // {
-      //   break;
-      // }
-
-    case APPLY_PLAYER_MOVE: {
-      break;
-    }
-  }
-}
-
-void MessageParser(Messages clientMessage, std::string message) {
-  switch (clientMessage) {
-    case Messages::YOUR_TURN: {
-      std::cout << "YOUR TURN MESSAGE RECEIVED." << std::endl;
-      if (clientState == WAIT_FOR_TURN) {
-        clientState = COMPUTE_MOVE;
-        ClientStateMachine();
-      }
-      break;
-    }
-
-    case Messages::WON_GAME: {
-      std::cout << "WON GAME MESSAGE RECEIVED." << std::endl;
-      break;
-    }
-
-    case Messages::LOST_GAME: {
-      std::cout << "LOST GAME MESSAGE RECEIVED." << std::endl;
-      break;
-    }
-
-    case Messages::ACTION_VALID: {
-      std::cout << "ACTION VALID MESSAGE RECEIVED." << std::endl;
-      // if (clientState == WAIT_FOR_ACK) {
-      //   clientState = APPLY_MOVE;
-      // }
-      break;
-    }
-
-    case Messages::ACTION_INVALID: {
-      std::cout << "ACTION INVALID MESSAGE RECEIVED." << std::endl;
-      break;
-    }
-
-    case Messages::MOVE: {
-      // std::cout << "MOVE COMMAND RECEIVED FROM SERVER. " << std::endl; StringToMove(message, boardState);
-      break;
-    }
-
-    default: {
-      std::cout << "Message not understood." << std::endl;
-      break;
-    }
-  }
 }

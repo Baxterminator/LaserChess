@@ -55,7 +55,16 @@ std::string makeValidAction();
 std::string makeInvalidAction();
 std::string makeWon();
 std::string makeLost();
-std::string makeLvlDescription(const char *);
+std::string makeLvlDescription(const char *lvl, bool start_now);
+
+bool isLvlDescription(const std::string &);
+bool isMyTurn(const std::string &);
+bool isLost(const std::string &);
+bool isWon(const std::string &);
+bool isInvalidAction(const std::string &);
+bool isValidAction(const std::string &);
+bool isMove(const std::string &);
+bool isRot(const std::string &);
 
 std::shared_ptr<game::Move> parseMove(const char *);
 

@@ -29,7 +29,7 @@ class Socket : public SocketBase {
    */
   Socket(SOCKET sock);
 
-  Socket() {}
+  Socket() { std::cout << "Going through the empty constructor..." << std::endl; }
 
   // ===========================================================================
   // Methods

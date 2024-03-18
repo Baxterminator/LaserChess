@@ -1,5 +1,9 @@
+#include <memory>
+
 #include "common/args/parser.hpp"
+#include "common/game/pieces/constants.hpp"
 #include "common/socket/server.hpp"
+#include "server/player.hpp"
 #include "server/server.hpp"
 
 using laser::args::ArgumentParser;
@@ -20,10 +24,9 @@ int main(int argc, char **argv) {
   auto lvl = parser.get<std::string>("--level", "level1");
 
   std::cout << "Initializing game server on port " << port << std::endl;
-  laser::server::GameServer server(port);
+  auto server = laser::server::GameServer(port);
   server.loadLevel(lvl.c_str());
   server.waitForPlayers();
-
   while (!server.isGameDone()) server.loop();
 
   return 0;

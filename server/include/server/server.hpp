@@ -10,7 +10,7 @@
 
 namespace laser::server {
 
-class GameServer : private com::SocketServer {
+class GameServer : public com::SocketServer {
  public:
   GameServer(int);
 
@@ -34,11 +34,11 @@ class GameServer : private com::SocketServer {
    */
   void loop();
 
- private:
-  const char* lvl;
+ public:
+  const char* lvl{""};
   game::Board board;
   bool round_player1 = true;
-  Player player1, player2;
+  std::shared_ptr<Player> player1, player2;
   bool done = false;
 };
 
