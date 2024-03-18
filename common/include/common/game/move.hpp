@@ -7,47 +7,38 @@
 
 namespace laser::game {
 
-typedef enum rotationDirections_tag { LEFT, RIGHT } RotationDirection_t;
+struct Move {
+  Vector StartPosition;
+  Vector EndPosition;
 
-class Move {
- public:
+  Move(Vector pos) : StartPosition(pos), EndPosition(ZERO_VECTOR) {}
+  Move(Vector startPosition, Vector endPosition) : StartPosition(startPosition), EndPosition(endPosition) {}
   virtual ~Move() = default;
   virtual bool LegalMove(const Board_t& board, PieceColor playerColor) const = 0;
   virtual void ApplyMove(Board& board) = 0;
-
-  // bool operator==(Move& move) {
-  //     return this->equals(move);
-  // }
 };
 
 // Classic shift. Move from one square to the other
-class ShiftMove : public Move {
- public:
-  Vector StartPosition;
-  Vector EndPosition;
-  ShiftMove(Vector startPosition, Vector endPosition) : StartPosition(startPosition), EndPosition(endPosition) {}
+struct ShiftMove : public Move {
+  ShiftMove(Vector startPosition, Vector endPosition) : Move(startPosition, endPosition) {}
   bool LegalMove(const Board_t& board, PieceColor playerColor) const override;
   void ApplyMove(Board& board) override;
 };
 
 // Switches positions with the piece (Only switches can perform this move)
-class SwitchMove : public Move {
- public:
-  Vector StartPosition;
-  Vector EndPosition;
-  SwitchMove(Vector startPosition, Vector endPosition) : StartPosition(startPosition), EndPosition(endPosition) {}
+struct SwitchMove : public Move {
+  SwitchMove(Vector startPosition, Vector endPosition) : Move(startPosition, endPosition) {}
   bool LegalMove(const Board_t& board, PieceColor playerColor) const override;
   void ApplyMove(Board& board) override;
 };
 
-class RotateMove : public Move {
- public:
-  RotationDirection_t RotationDirection;
-  Vector PiecePosition;
-  RotateMove(Vector piecePosition, RotationDirection_t rotDirection)
-      : RotationDirection(rotDirection), PiecePosition(piecePosition) {}
-  RotateMove() {}
-  // bool LegalMove(const Board_t& board, PieceColors_t playerColor) override;
+struct RotateMove : public Move {
+  RotationDirection direction;
+
+  RotateMove(Vector piecePosition, RotationDirection rotDirection) : Move(piecePosition), direction(rotDirection) {}
+  RotateMove() : Move(ZERO_VECTOR) {}
+  bool LegalMove(const Board_t& board, PieceColor playerColor) const override { return true; };
+  void ApplyMove(Board& board) {}
 };
 
 }  // namespace laser::game

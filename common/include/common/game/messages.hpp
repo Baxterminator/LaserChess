@@ -2,9 +2,12 @@
 #define LASER_CHESS_MESSAGES
 
 #include <cstring>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
+
+#include "common/game/move.hpp"
 
 namespace laser::com {
 
@@ -21,6 +24,9 @@ enum Messages {
   YOUR_TURN,
   ACTION_VALID,
   ACTION_INVALID,
+
+  MOVE,
+  ROT,
 
   // Results
   WON_GAME,
@@ -45,6 +51,13 @@ std::string getCommand(const std::string &str);
 Messages getMessage(const std::string &msg);
 
 std::string makeTurnCommand();
+std::string makeValidAction();
+std::string makeInvalidAction();
+std::string makeWon();
+std::string makeLost();
+std::string makeLvlDescription(const char *);
+
+std::shared_ptr<game::Move> parseMove(const char *);
 
 }  // namespace laser::com
 

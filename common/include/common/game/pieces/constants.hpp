@@ -40,6 +40,8 @@ enum class LaserInteraction {
   HIT,
 };
 
+enum class RotationDirection { LEFT, RIGHT };
+
 }  // namespace laser::game
 
 #endif

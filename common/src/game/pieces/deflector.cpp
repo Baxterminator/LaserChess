@@ -13,16 +13,16 @@ Orientation Deflector::LaserDirectionToOrientation(Vector laserDirection) const 
   }
 
   else if (laserDirection == DOWN_VECTOR) {
-    orientation = Orientation::NORTH_EAST;
+    orientation = Orientation::NORTH_WEST;
   }
 
   else if (laserDirection == RIGHT_VECTOR) {
-    orientation = Orientation::SOUTH_EAST;
+    orientation = Orientation::NORTH_EAST;
   }
 
-  else if (laserDirection == LEFT_VECTOR) {
-    orientation = Orientation::NORTH_WEST;
-  }
+  // else if (laserDirection == LEFT_VECTOR) {
+  //   orientation = Orientation::NORTH_WEST;
+  // }
 
   return orientation;
 }
@@ -36,28 +36,29 @@ std::pair<LaserInteraction, Vector> Deflector::GetLaserInteraction(Vector incomi
       break;
     }
 
-    case Orientation::NORTH_EAST: {
-      otherAcceptedOrientation = Orientation::NORTH_WEST;
-      break;
-    }
-
-    case Orientation::SOUTH_EAST: {
-      otherAcceptedOrientation = Orientation::SOUTH_WEST;
-      break;
-    }
-
     case Orientation::NORTH_WEST: {
       otherAcceptedOrientation = Orientation::NORTH_EAST;
       break;
     }
-
-    default: {
-      // should never happen
-      break;
-    }
   }
 
-  if (laserOrientation == this->orient || laserOrientation == otherAcceptedOrientation) {
+  if ((incomingLaser == DOWN_VECTOR) &&
+      ((this->orient == Orientation::NORTH_EAST) || (this->orient == Orientation::NORTH_WEST))) {
+    return std::make_pair(LaserInteraction::DEFLECT, this->GetDeflectedLaserDirection(incomingLaser));
+  }
+
+  else if ((incomingLaser == UP_VECTOR) && (this->orient == Orientation::SOUTH_EAST) &&
+           (this->orient == Orientation::SOUTH_WEST)) {
+    return std::make_pair(LaserInteraction::DEFLECT, this->GetDeflectedLaserDirection(incomingLaser));
+  }
+
+  else if ((incomingLaser == RIGHT_VECTOR) && (this->orient == Orientation::NORTH_WEST) ||
+           (this->orient == Orientation::SOUTH_WEST)) {
+    return std::make_pair(LaserInteraction::DEFLECT, this->GetDeflectedLaserDirection(incomingLaser));
+  }
+
+  if ((incomingLaser == LEFT_VECTOR) && (this->orient == Orientation::NORTH_EAST) ||
+      (this->orient == Orientation::SOUTH_EAST)) {
     return std::make_pair(LaserInteraction::DEFLECT, this->GetDeflectedLaserDirection(incomingLaser));
   }
 

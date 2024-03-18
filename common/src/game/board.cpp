@@ -2,8 +2,10 @@
 
 #include <algorithm>
 #include <array>
+#include <iostream>
 #include <limits>
 #include <memory>
+#include <sstream>
 #include <vector>
 
 #include "common/game/move.hpp"
@@ -50,20 +52,27 @@ Square* LaserHit(Board& board, PieceColor playerColor) {
     }
     position = position + laserDirection;
   }
+  return nullptr;
 }
 
 std::shared_ptr<Piece> Board::RemoveLaserHitPiece(Square* pHitSquare) {
   std::shared_ptr<Piece> hitPiece = pHitSquare->Piece;
-  if (pHitSquare->Piece->GetPieceColor() == PieceColor::BLUE) {
-    this->BluePiecesSquares.erase(*pHitSquare);
-    // Piece is destroyed
-    pHitSquare->Piece = nullptr;
-  }
+  try {
+    std::shared_ptr<Piece> hitPiece = pHitSquare->Piece;
+    if (pHitSquare->Piece->GetPieceColor() == PieceColor::BLUE) {
+      this->BluePiecesSquares.erase(*pHitSquare);
+      // Piece is destroyed
+      pHitSquare->Piece = nullptr;
+    }
 
-  else if (pHitSquare->Piece->GetPieceColor() == PieceColor::RED) {
-    this->RedPiecesSquares.erase(*pHitSquare);
-    // Piece is destroyed
-    pHitSquare->Piece = nullptr;
+    else if (pHitSquare->Piece->GetPieceColor() == PieceColor::RED) {
+      this->RedPiecesSquares.erase(*pHitSquare);
+      // Piece is destroyed
+      pHitSquare->Piece = nullptr;
+    }
+    return hitPiece;
+  } catch (...) {
+    std::cout << "something went wrong" << std::endl;
   }
 
   return hitPiece;
@@ -127,11 +136,6 @@ float EvaluatePiece(std::unordered_set<Square, Square::HashFunction>& pieceSquar
         }
       }
     }
-
-    // Move defender in front of king if he's exposed
-    //  else if (pieceType == DEFENDER) {
-    //      Vector defendPosition = ownKingPosition - pieceSq.Position;
-    //  }
   }
 
   return score;
@@ -199,71 +203,7 @@ std::vector<std::shared_ptr<Move>> FindLegalMoves(const Board_t& board, const Sq
 
 void ApplyMove(Board& board, Move& move) {}
 
-// Populates the board with default setup (for testing purposes)
-void Board::CreateDefaultBoard() {
-  Board_t defaultBoard;
-
-  for (int i = 0; i < ROW_COUNT; i++) {
-    for (int j = 0; j < COLUMN_COUNT; j++) {
-      PieceColor resColor = PieceColor::NONE;
-
-      if (j == 0 || (j == COLUMN_COUNT - 2 && (i == 0 || i == COLUMN_COUNT - 1))) {
-        resColor = PieceColor::RED;
-      }
-
-      else if (j == COLUMN_COUNT - 1 || (j == 1 && (i == 0 || i == COLUMN_COUNT - 1))) {
-        resColor = PieceColor::BLUE;
-      }
-      Square sq = Square({j, i}, resColor);
-      defaultBoard[i][j] = sq;
-    }
-  }
-
-  // populates the pieces according to ACE setup
-  // creates the red player pieces
-  defaultBoard[0][0].Piece = std::make_shared<Laser>(PieceColor::RED, Orientation::SOUTH);
-  defaultBoard[0][4].Piece = std::make_shared<Defender>(PieceColor::RED, Orientation::SOUTH);
-  defaultBoard[0][5].Piece = std::make_shared<King>(PieceColor::RED, Orientation::SOUTH);
-  defaultBoard[0][6].Piece = std::make_shared<Defender>(PieceColor::RED, Orientation::SOUTH);
-  defaultBoard[0][7].Piece = std::make_shared<Deflector>(PieceColor::RED, Orientation::SOUTH_EAST);
-
-  defaultBoard[1][2].Piece = std::make_shared<Deflector>(PieceColor::RED, Orientation::SOUTH_WEST);
-
-  defaultBoard[3][0].Piece = std::make_shared<Deflector>(PieceColor::RED, Orientation::NORTH_EAST);
-  defaultBoard[3][4].Piece = std::make_shared<Switch>(PieceColor::RED, Orientation::NORTH_WEST);
-  defaultBoard[3][5].Piece = std::make_shared<Switch>(PieceColor::RED, Orientation::NORTH_EAST);
-  defaultBoard[3][7].Piece = std::make_shared<Deflector>(PieceColor::RED, Orientation::SOUTH_EAST);
-
-  defaultBoard[4][0].Piece = std::make_shared<Deflector>(PieceColor::RED, Orientation::SOUTH_EAST);
-  defaultBoard[4][7].Piece = std::make_shared<Deflector>(PieceColor::RED, Orientation::NORTH_EAST);
-
-  defaultBoard[5][6].Piece = std::make_shared<Deflector>(PieceColor::RED, Orientation::SOUTH_EAST);
-
-  // Creates the blue player pieces
-  defaultBoard[7][2].Piece = std::make_shared<Deflector>(PieceColor::BLUE, Orientation::NORTH_WEST);
-  defaultBoard[7][3].Piece = std::make_shared<Defender>(PieceColor::BLUE, Orientation::NORTH);
-  defaultBoard[7][4].Piece = std::make_shared<King>(PieceColor::BLUE, Orientation::NORTH);
-  defaultBoard[7][5].Piece = std::make_shared<Defender>(PieceColor::BLUE, Orientation::NORTH);
-  defaultBoard[7][9].Piece = std::make_shared<Laser>(PieceColor::BLUE, Orientation::NORTH);
-
-  defaultBoard[6][7].Piece = std::make_shared<Deflector>(PieceColor::BLUE, Orientation::NORTH_EAST);
-
-  defaultBoard[4][2].Piece = std::make_shared<Deflector>(PieceColor::BLUE, Orientation::NORTH_WEST);
-  defaultBoard[4][4].Piece = std::make_shared<Switch>(PieceColor::BLUE, Orientation::NORTH_EAST);
-  defaultBoard[4][5].Piece = std::make_shared<Switch>(PieceColor::BLUE, Orientation::NORTH_WEST);
-  defaultBoard[4][9].Piece = std::make_shared<Deflector>(PieceColor::BLUE, Orientation::SOUTH_WEST);
-
-  defaultBoard[3][2].Piece = std::make_shared<Deflector>(PieceColor::BLUE, Orientation::SOUTH_WEST);
-  defaultBoard[3][9].Piece = std::make_shared<Deflector>(PieceColor::BLUE, Orientation::NORTH_WEST);
-
-  defaultBoard[2][3].Piece = std::make_shared<Deflector>(PieceColor::BLUE, Orientation::NORTH_WEST);
-
-  this->board = defaultBoard;
-
-  this->PopulatePiecesSets();
-}
-
-void Board::PopulatePiecesSets() {
+void Board::populatePiecesSets() {
   std::shared_ptr<Piece> curPiece = nullptr;
   for (int i = 0; i < ROW_COUNT; i++) {
     for (int j = 0; j < COLUMN_COUNT; j++) {
@@ -282,7 +222,46 @@ void Board::PopulatePiecesSets() {
   }
 }
 
-void FindBestMove(PieceColor playerColor, Board board) {
+std::string MoveToStringRepresentation(std::shared_ptr<Move> move) {
+  std::string startColumn = std::to_string(move->StartPosition.x);
+  std::string startRow = std::to_string(move->StartPosition.y);
+  std::string endColumn = std::to_string(move->EndPosition.x);
+  std::string endRow = std::to_string(move->EndPosition.y);
+
+  std::string moveStringRepresentation =
+      ";move " + startRow + " " + startColumn + " " + endRow + " " + endColumn + "\n";
+  return moveStringRepresentation;
+}
+
+void StringToMove(std::string moveString, Board& board) {
+  std::stringstream strStream;
+  strStream << moveString.substr(6);
+  std::vector<int> numbers;
+  for (int i = 0; strStream >> i;) {
+    numbers.push_back(i);
+    // std::cout << i << " ";
+  }
+
+  int startRow = numbers[0];
+  int startColumn = numbers[1];
+  int endRow = numbers[2];
+  int endColumn = numbers[3];
+
+  Vector startPosition = {startRow, startColumn};
+  Vector endPosition = {endRow, endColumn};
+  // Switch places?
+  if (board.board[endRow][endColumn].Piece == nullptr) {
+    std::shared_ptr<ShiftMove> shiftMove = std::make_shared<ShiftMove>(ShiftMove(startPosition, endPosition));
+    MakeMove(board, shiftMove, PieceColor::RED);
+  }
+
+  else {
+    std::shared_ptr<SwitchMove> switchMove = std::make_shared<SwitchMove>(SwitchMove(startPosition, endPosition));
+    MakeMove(board, switchMove, PieceColor::RED);
+  }
+}
+
+std::string FindBestMove(PieceColor playerColor, Board& board) {
   float bestEval = 0.0f;
   std::unordered_set<Square, Square::HashFunction> playerSquares;
   if (playerColor == PieceColor::BLUE) {
@@ -305,5 +284,7 @@ void FindBestMove(PieceColor playerColor, Board board) {
             [](MoveEvaluation a, MoveEvaluation b) { return a.Evaluation > b.Evaluation; });
   // Applies the move to the board.
   MakeMove(board, evaluationResults[0].Move, playerColor);
+  std::string moveStringRepresentation = MoveToStringRepresentation(evaluationResults[0].Move);
+  return moveStringRepresentation;
 }
 }  // namespace laser::game

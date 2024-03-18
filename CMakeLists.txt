@@ -24,8 +24,8 @@ endif()
 
 ##########################     AI     #############################
 file(GLOB_RECURSE ai_src RELATIVE "${CMALE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/ai/src/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/ai/src/**/**.cpp")
-if (ai_src)
-  add_executable(ai_client ${ai_src})
-  target_include_directories(ai_client PRIVATE "ai/include" "common/include")
-  target_link_libraries(ai_client PRIVATE common)
-endif()
+# if (ai_src)
+#   add_executable(ai_client ${ai_src})
+#   target_include_directories(ai_client PRIVATE "ai/include" "common/include")
+#   target_link_libraries(ai_client PRIVATE common)
+# endif()

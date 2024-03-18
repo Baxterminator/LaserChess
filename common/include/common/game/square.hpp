@@ -12,8 +12,6 @@ class Square {
   std::shared_ptr<Piece> Piece;
   PieceColor ReservedSquare;  // Some squares are reserved for red/blue
 
-  Square(Vector position, PieceColor reservedSquare)
-      : Position(position), Piece(nullptr), ReservedSquare(reservedSquare){};
   Square() : Position({-1, -1}), Piece(nullptr), ReservedSquare(PieceColor::NONE){};
 
   bool operator==(const Square& otherSquare) const { return this->Position == otherSquare.Position; }

@@ -1,9 +1,9 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
-#include <array>
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 #include "common/game/square.hpp"
 
@@ -12,7 +12,7 @@ namespace laser::game {
 #define ROW_COUNT 8
 #define COLUMN_COUNT 10
 
-typedef std::array<std::array<Square, COLUMN_COUNT>, ROW_COUNT> Board_t;
+typedef std::vector<std::vector<Square>> Board_t;
 
 class Board {
  public:
@@ -22,12 +22,12 @@ class Board {
 
   Board(){};
   ~Board(){};
-  bool CreateBoardFromLayoutString(std::string LayoutString);
-  void CreateDefaultBoard();
-  void PopulatePiecesSets();
-  // void FindBestMove(PieceColors_t playerColor);
+
+  bool loadFromString(std::string LayoutString);
+  void populatePiecesSets();
   std::shared_ptr<Piece> RemoveLaserHitPiece(Square *pHitSquare);
-  // void MakeMove(const Move& move);
+
+  PieceColor hasSomeoneWon();
 };
 
 void FindBestMove(PieceColor playerColor, Board board);

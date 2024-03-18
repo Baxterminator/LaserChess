@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "common/game/board.hpp"
 #include "common/socket/server.hpp"
 #include "common/socket/socket.hpp"
 #include "server/player.hpp"
@@ -16,12 +17,17 @@ class GameServer : private com::SocketServer {
   /**
    * @brief Wait for two players to connect.
    */
-  void wait_for_players();
+  void waitForPlayers();
+
+  /**
+   * @brief Load the level for the server.
+   */
+  void loadLevel(const char*);
 
   /**
    * @brief Return whether the game is over or not
    */
-  inline bool is_game_done() { return done; }
+  inline bool isGameDone() { return done; }
 
   /**
    * @brief Compute the next server loop.
@@ -29,6 +35,8 @@ class GameServer : private com::SocketServer {
   void loop();
 
  private:
+  const char* lvl;
+  game::Board board;
   bool round_player1 = true;
   Player player1, player2;
   bool done = false;

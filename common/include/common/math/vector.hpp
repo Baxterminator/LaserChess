@@ -7,7 +7,7 @@ typedef unsigned long ulong;
 
 struct Vector {
   // position
-  int x, y;
+  long x, y;
 
   // Operators
   inline bool operator==(const Vector& v) const { return (x == v.x) && (y == v.y); }

@@ -7,6 +7,7 @@ using laser::args::ArgumentParser;
 ArgumentParser make_parser() {
   auto parser = ArgumentParser();
   parser.add_arg("--port");
+  parser.add_arg("--level");
   return parser;
 }
 
@@ -16,12 +17,14 @@ int main(int argc, char **argv) {
   parser.parse_args(argc, argv);
   parser.display_args();
   auto port = parser.get<int>("--port", 5001);
+  auto lvl = parser.get<std::string>("--level", "level1");
 
   std::cout << "Initializing game server on port " << port << std::endl;
   laser::server::GameServer server(port);
-  server.wait_for_players();
+  server.loadLevel(lvl.c_str());
+  server.waitForPlayers();
 
-  while (!server.is_game_done()) server.loop();
+  while (!server.isGameDone()) server.loop();
 
   return 0;
 }
