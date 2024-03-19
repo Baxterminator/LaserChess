@@ -15,6 +15,7 @@
 #include "common/game/pieces/deflector.hpp"
 #include "common/game/pieces/king.hpp"
 #include "common/game/pieces/laser.hpp"
+#include "common/game/pieces/piece.hpp"
 #include "common/game/pieces/switch.hpp"
 
 // In theory 8 possible moves
@@ -287,4 +288,13 @@ std::string FindBestMove(PieceColor playerColor, Board& board) {
   std::string moveStringRepresentation = MoveToStringRepresentation(evaluationResults[0].Move);
   return moveStringRepresentation;
 }
+
+PieceColor Board::hasSomeoneWon() {
+  auto blue = FindKingPosition(BluePiecesSquares);
+  auto red = FindKingPosition(RedPiecesSquares);
+
+  return (blue.x == -1 || blue.y == -1) ? PieceColor::RED
+                                        : ((red.x == -1 || red.y == -1) ? PieceColor::BLUE : PieceColor::NONE);
+}
+
 }  // namespace laser::game

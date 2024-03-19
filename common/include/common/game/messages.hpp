@@ -43,6 +43,10 @@ inline static std::unordered_map<Messages, std::pair<const char *, unsigned char
     {Messages::YOUR_TURN, {"yourturn", 8}},
     {Messages::WON_GAME, {"won", 3}},
     {Messages::LOST_GAME, {"lost", 4}},
+    {Messages::MOVE, {"move", 4}},
+    {Messages::ROT, {"rot", 3}},
+    {Messages::ACTION_VALID, {"action valid", 12}},
+    {Messages::ACTION_INVALID, {"action invalid", 14}},
     {Messages::INVALID_MESSAGE, {"invalid", 7}},
 };
 

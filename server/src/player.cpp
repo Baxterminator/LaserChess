@@ -12,9 +12,12 @@ Player::Player(std::string _name, game::PieceColor color, SOCKET sk) : com::Sock
 
 std::shared_ptr<game::Move> Player::getMovement() {
   // Receive data
-  if (auto error = receive_data(last_msg); error != com::SocketErrors::NO_ERROR) {
-    return nullptr;
-  }
+  last_msg = "";
+  do {
+    if (auto error = receive_data(last_msg); error != com::SocketErrors::NO_ERROR) {
+      return nullptr;
+    }
+  } while (last_msg.length() == 0);
 
   // Parse data
   return com::parseMove(last_msg.c_str());

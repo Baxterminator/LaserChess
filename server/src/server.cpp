@@ -30,7 +30,6 @@ void GameServer::waitForPlayers() {
 }
 
 void GameServer::loop() {
-  std::cout << "Beginning loop" << std::endl;
   // Get player turn
   auto player = (round_player1) ? player1 : player2;
   auto other = (round_player1) ? player2 : player1;
@@ -41,25 +40,24 @@ void GameServer::loop() {
     std::cout << "Socket error " << com::error2String(error) << " - " << strerror(errno) << "! Stopping client..."
               << std::endl;
   };
-  if (auto error = player->send_data(com::makeTurnCommand()); error != com::SocketErrors::NO_ERROR) {
-    std::cout << "Socket error " << com::error2String(error) << " - " << strerror(errno) << "! Stopping client..."
-              << std::endl;
-  };
 
   bool valid = false;
 
   // Wait for a valid action
-  while (!valid) {
+  do {
     auto move = player->getMovement();
 
     // Check his action
-    if (move->LegalMove(board.board, player->color)) {
+    if (valid = move->LegalMove(board.board, player->color); valid) {
+      std::cout << "\tGot valid action :)" << std::endl;
       move->ApplyMove(board);
       player->sendMoveValid();
       other->send_data(player->last_msg);  // Send the data to the other so it can update its map
-    } else
+    } else {
+      std::cout << "\tGot invalid action :(" << std::endl;
       player->sendMoveInvalid();
-  }
+    }
+  } while (!valid);
 
   // Test if won (end the game)
   if (auto c = board.hasSomeoneWon(); c != game::PieceColor::NONE) {
@@ -75,6 +73,7 @@ void GameServer::loop() {
 
   // Prepare for next loop
   round_player1 = !round_player1;
+  usleep(50000);
 }
 
 }  // namespace laser::server

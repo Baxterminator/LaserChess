@@ -14,18 +14,16 @@ namespace laser::ai {
 LaserChessAI::LaserChessAI(const std::string& server_ip, int server_port) : com::Socket(server_ip, server_port) {}
 
 void LaserChessAI::loop() {
-  std::cout << "Loop" << std::endl;
   // Receive data
-  if (auto error = receive_data(rec_msg); error != com::SocketErrors::NO_ERROR) {
-    std::cout << "Socket error " << com::error2String(error) << " - " << strerror(errno) << "! Stopping client..."
-              << std::endl;
-    error_somewhere = true;
-    return;
-  }
-  if (rec_msg.length() == 0) {
-    std::cout << rec_msg << std::endl;
-    return;
-  }
+  rec_msg = "";
+  do {
+    if (auto error = receive_data(rec_msg); error != com::SocketErrors::NO_ERROR) {
+      std::cout << "Socket error " << com::error2String(error) << " - " << strerror(errno) << "! Stopping client..."
+                << std::endl;
+      error_somewhere = true;
+      return;
+    }
+  } while (rec_msg.length() == 0);
 
   // If won or lost, stop the AI
   won = com::isWon(rec_msg);
@@ -78,10 +76,11 @@ void LaserChessAI::computeTurn() {
     return;
   }
 
-  std::cout << "Compute action turn" << std::endl;
+  std::cout << "\tCompute action turn" << std::endl;
 
   // Send computed action
   std::string moveString = FindBestMove(game::PieceColor::BLUE, board);
+  std::cout << "\t Sending " << moveString << std::endl;
   if (auto error = send_data(moveString); error != laser::com::SocketErrors::NO_ERROR) {
     std::cout << "Socket error " << com::error2String(error) << "! Stopping client..." << std::endl;
     error_somewhere = true;
@@ -89,11 +88,15 @@ void LaserChessAI::computeTurn() {
   }
 
   // Wait for server validation
-  receive_data(rec_msg);
+  rec_msg = "";
+  do {
+    receive_data(rec_msg);
+  } while (rec_msg.length() == 0);
+
   if (com::isInvalidAction(rec_msg)) {
     std::cout << "Using an invalid action? Stopping the client ..." << std::endl;
   } else if (com::isValidAction(rec_msg)) {
-    std::cout << "Got action acknolegment!" << std::endl;
+    std::cout << "\tGot action acknowlegment!" << std::endl;
     std::cout << "Waiting for other player action ..." << std::endl;
     state = AIState::OTHER_TURN;
   } else {
@@ -111,10 +114,13 @@ void LaserChessAI::processOtherTurn() {
     return;
   }
 
+  std::cout << "\tGot other player turn" << std::endl;
+
   // Apply move
   auto move = com::parseMove(rec_msg.c_str());
   move->ApplyMove(board);
 
+  std::cout << "Waiting for my turn" << std::endl;
   state = AIState::MY_TURN;
 }
 
